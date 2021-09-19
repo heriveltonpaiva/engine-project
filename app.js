@@ -2,7 +2,7 @@ const template = require('./templatePdf');
 const parser = require('./parse');
 const init = require('./init-app');
 const pdf = require('./generatePdf');
-const apiUrl = 'http://api.trackear.com.br/v1/denat/chassi/';
+const apiUrl = 'http://api.trackear.com.br/v1/denat/motor/';
 const macaddress = require('macaddress');
 var fs = require('fs')
 var mainList = new Array();
@@ -26,13 +26,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function execute() {
         log = "";
-        const chassi = document.getElementById('chassiNumber').value;
+        const engine = document.getElementById('engineNumber').value;
         quantity = document.getElementById('quantity').value;
 
-        if (validate(chassi, quantity)) {
+        if (validate(engine, quantity)) {
             init.enableProcessButton();
             registerLog('Iniciando processamento!')
-            mainList = generateChassiList(chassi, quantity);
+            mainList = generateEngineList(engine, quantity);
             updateProgressBar(10);
             processChassi(mainList);
         }
@@ -90,7 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function saveResponse(json, index, chassi) {
         const situacao = json.resultado.situacao;
-        registerLog("[" + index + "] Chassi: " + chassi + " - Situação: " + situacao);
+        registerLog("[" + index + "] Motor: " + chassi + " - Situação: " + situacao);
         if (situacao === 'S/1 EMPLAC') {
             return json;
         }
@@ -116,7 +116,7 @@ function processTextAndGeneratePdf(dataList, mainList, quantity) {
         });
         const pdfName = "VEICULOS_" + mainList[0] + "_" + quantity;
         pdf.generatePDF(textVehicle, pdfName);
-        registerLog('Arquivo ' + pdfName + '.pdf gerado com sucesso!');
+        //registerLog('Arquivo ' + pdfName + '.pdf gerado com sucesso!');
 
         init.showProcessedWithPdf();
     } else {
@@ -131,29 +131,19 @@ function registerLog(message) {
     document.getElementById('processArea').value = log;
 }
 
-function generateChassiList(chassi, quantity) {
+function generateEngineList(engine, quantity) {
     var list = new Array();
-    const initial = chassi.substring(0, 13);
-    const sequence = chassi.substring(13);
+    const totalChar = engine.length;
+    const init = engine.substring(0, (totalChar -4));
+    const sequence = engine.substring((totalChar - 4), totalChar);
 
+    console.log(init+ " - "+sequence);
     let nextValue = parseInt(sequence);
     let cont = 0;
 
-    while (cont < quantity) {
-        list.push(initial.concat(nextValue))
-        if (getOptionValueChecked() == 2) {
-            var count = 0;
-            var total = 10;
-            var digit = "X";
-            while (count <= total) {
-                const init = chassi.substring(0, 8);
-                const sequence = chassi.substring(9, 13);
-                console.log(init.concat(digit).concat(sequence).concat(nextValue));
-                list.push(init.concat(digit).concat(sequence).concat(nextValue))
-                digit = count;
-                count++;
-            }
-        }
+    while (cont < quantity) {  
+        console.log(nextValue);
+        list.push(init.concat(nextValue))
         cont++;
         nextValue = parseInt(sequence) + cont;
     }

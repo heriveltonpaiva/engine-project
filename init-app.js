@@ -1,6 +1,6 @@
 
 exports.reset = function () {
-    document.getElementById('chassiNumber').value = ''
+    document.getElementById('engineNumber').value = ''
     document.getElementById('quantity').value = ''
     document.getElementById('processArea').value = ''
     document.getElementById("clear").style.display = "none";
